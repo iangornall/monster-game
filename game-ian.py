@@ -98,6 +98,17 @@ class Hero(Character):
     def stopY(self):
         self.y_speed = 0
 
+def check_collision(hero, monster):
+    if hero.x + 32 < monster.x:
+        return False
+    if monster.x + 32 < hero.x:
+        return False
+    if hero.y + 32 < monster.y:
+        return False
+    if monster.y + 32 < hero.y:
+        return False
+    return True
+
 def main():
     width = 512
     height = 480
@@ -147,6 +158,8 @@ def main():
             monster.change_direction[direction]()
         wrap = True
         monster.move(wrap, min_x, min_y, max_x, max_y)
+        if check_collision(hero, monster):
+            print('Collision Detected')
 
         # Draw background
         screen.fill([255,255,255])
