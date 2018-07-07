@@ -54,17 +54,16 @@ class Character(object):
     def blit(self, screen):
         screen.blit(self.image, (self.x, self.y))
 
-
-class Monster(Character):
+class Enemy(Character):
     def __init__(self, image_path, width, height, hero_x, hero_y, hero_width, hero_height):
-        super(Monster, self).__init__(image_path)
+        super(Enemy, self).__init__(image_path)
         x_offset = random.randint(hero_width, width / 2 - hero_width * 1.5) * random.randrange(-1, 2, 2)
         self.x = hero_x - x_offset
         y_offset = random.randint(hero_height, height / 2 - hero_height * 1.5) * random.randrange(-1, 2, 2)
         self.y = hero_y - y_offset
         self.start_x = self.x
         self.start_y = self.y
-        self.pace = 1
+        self.pace = None
         self.x_speed = 0
         self.y_speed = 0
         self.change_direction = {'north': self.north, 
@@ -82,7 +81,17 @@ class Monster(Character):
         self.x_speed = 0
         self.y_speed = 0
         self.hidden = True
-    
+
+class Monster(Enemy):
+    def __init__(self, image_path, width, height, hero_x, hero_y, hero_width, hero_height):
+        super(Monster, self).__init__(image_path, width, height, hero_x, hero_y, hero_width, hero_height)
+        self.pace = 1
+
+class Goblin(Enemy):
+    def __init__(self, image_path, width, height, hero_x, hero_y, hero_width, hero_height):
+        super(Goblin, self).__init__(image_path, width, height, hero_x, hero_y, hero_width, hero_height)
+        self.pace = 0.5
+
 
 class Hero(Character):
     def __init__(self, image_path, screen_width, screen_height):
@@ -136,6 +145,8 @@ def main():
 
     monster = Monster('./images/monster.png', width, height, hero.x, hero.y, hero.width, hero.height)
 
+    goblin = Goblin('./images/goblin.png', width, height, hero.x, hero.y, hero.width, hero.height)
+
     font = pygame.font.Font(None, 25)
     win_text = font.render('Hit ENTER to play again!', True, (0, 0, 0))
     show_win_text = False
@@ -173,10 +184,13 @@ def main():
         if not monster.hidden:
             if (time.time() - 2 > start):
                 start += 2
-                direction = random.choice(('north', 'east', 'south', 'west', 'northwest', 'northeast', 'southwest', 'southeast'))
-                monster.change_direction[direction]()
+                monster_direction = random.choice(('north', 'east', 'south', 'west', 'northwest', 'northeast', 'southwest', 'southeast'))
+                monster.change_direction[monster_direction]()
+                goblin_direction = random.choice(('north', 'east', 'south', 'west', 'northwest', 'northeast', 'southwest', 'southeast'))
+                goblin.change_direction[goblin_direction]()
             wrap = True
             monster.move(wrap, min_x, min_y, max_x, max_y)
+            goblin.move(wrap, min_x, min_y, max_x, max_y)
         if check_collision(hero, monster):
             monster.hide()
             win_sound.play()
@@ -188,6 +202,7 @@ def main():
         hero.blit(screen)
         if not monster.hidden:
             monster.blit(screen)
+            goblin.blit(screen)
         if show_win_text:
             screen.blit(win_text, (width / 2 - win_text.get_width() / 2, height / 2 - win_text.get_height() / 2))
 
