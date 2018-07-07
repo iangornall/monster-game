@@ -24,6 +24,12 @@ def main():
     monster_x = hero_x - monster_x_offset
     monster_y_offset = random.randint(hero_height, height / 2 - hero_height * 1.5) * random.randrange(-1, 2, 2)
     monster_y = hero_y - monster_y_offset
+    min_x_position = hero_width
+    max_x_position = width - hero_width * 2
+    min_y_position = hero_height
+    max_y_position = height - hero_height * 2
+
+    count = 1
 
     stop_game = False
     while not stop_game:
@@ -33,9 +39,29 @@ def main():
 
             if event.type == pygame.QUIT:
                 stop_game = True
-
-
+        if count == 1:
+            direction = random.choice(('north', 'east', 'south', 'west'))
+        elif count == 120:
+            count = 0
         # Game logic
+        if direction == 'north':
+            monster_y -= 1
+            if monster_y < min_y_position:
+                monster_y = max_y_position
+        elif direction == 'east':
+            monster_x += 1
+            if monster_x > max_x_position:
+                monster_x = min_x_position
+        elif direction == 'south':
+            monster_y += 1
+            if monster_y > max_y_position:
+                monster_y = min_y_position
+        elif direction == 'west':
+            monster_x -= 1
+            if monster_x < min_x_position:
+                monster_x = max_x_position
+
+
         
 
         # Draw background
@@ -51,6 +77,7 @@ def main():
 
         pygame.display.update()
         clock.tick(60)
+        count += 1
 
     pygame.quit()
 
