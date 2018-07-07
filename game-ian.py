@@ -83,6 +83,8 @@ def main():
     hero_x = width / 2 - hero_width / 2
     hero_height = hero_image.get_rect().height
     hero_y = height / 2 - hero_height / 2
+    hero_x_speed = 0
+    hero_y_speed = 0
 
     monster = Monster('./images/monster.png', width, height, hero_x, hero_y, hero_width, hero_height)
 
@@ -96,12 +98,40 @@ def main():
     while not stop_game:
         for event in pygame.event.get():
             # Event handling
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_DOWN:
+                    hero_y_speed = 0.9
+                elif event.key == pygame.K_UP:
+                    hero_y_speed = -0.9
+                elif event.key == pygame.K_LEFT:
+                    hero_x_speed = -0.9
+                elif event.key == pygame.K_RIGHT:
+                    hero_x_speed = 0.9
+            if event.type == pygame.KEYUP:
+                if event.key == pygame.K_DOWN:
+                    hero_y_speed = 0
+                elif event.key == pygame.K_UP:
+                    hero_y_speed = 0
+                elif event.key == pygame.K_LEFT:
+                    hero_x_speed = 0
+                elif event.key == pygame.K_RIGHT:
+                    hero_x_speed = 0
             if event.type == pygame.QUIT:
                 stop_game = True
         
         # Game logic
         # if time.time() % 2 == 0:
         #     direction = random.choice(('north', 'east', 'south', 'west'))
+        hero_y += hero_y_speed
+        hero_x += hero_x_speed
+        if hero_y < min_y:
+            hero_y = min_y
+        elif hero_y > max_y:
+            hero_y = max_y
+        if hero_x < min_x:
+            hero_x = min_x
+        elif hero_x > max_x:
+            hero_x = max_x
         if (time.time() - 2 > start):
             start += 2
             direction = random.choice(('north', 'east', 'south', 'west', 'northwest', 'northeast', 'southwest', 'southeast'))
