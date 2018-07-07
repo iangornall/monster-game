@@ -62,6 +62,8 @@ class Monster(Character):
         self.x = hero_x - x_offset
         y_offset = random.randint(hero_height, height / 2 - hero_height * 1.5) * random.randrange(-1, 2, 2)
         self.y = hero_y - y_offset
+        self.start_x = self.x
+        self.start_y = self.y
         self.pace = 1
         self.x_speed = 0
         self.y_speed = 0
@@ -73,15 +75,21 @@ class Monster(Character):
                     'northeast': self.northeast, 
                     'southwest': self.southwest, 
                     'southeast': self.southeast}
+        self.hidden = False
+    def hide(self):
+        self.x = 0
+        self.y = 0
+        self.x_speed = 0
+        self.y_speed = 0
+        self.hidden = True
     
 
 class Hero(Character):
-    def __init__(self, image_path, width, height):
+    def __init__(self, image_path, screen_width, screen_height):
         super(Hero, self).__init__(image_path)
         self.width = self.image.get_rect().width
-        self.x = width / 2 - self.width / 2
         self.height = self.image.get_rect().height
-        self.y = height / 2 - self.height / 2
+        self.position_center(screen_width, screen_height)
         self.pace = 0.9
         self.x_speed = 0
         self.y_speed = 0
@@ -93,6 +101,9 @@ class Hero(Character):
                                 pygame.K_UP: self.stopY,
                                 pygame.K_LEFT: self.stopX,
                                 pygame.K_RIGHT: self.stopX}
+    def position_center(self, screen_width, screen_height):
+        self.x = screen_width / 2 - self.width / 2
+        self.y = screen_height / 2 - self.height / 2
     def stopX(self):
         self.x_speed = 0
     def stopY(self):
@@ -112,7 +123,8 @@ def check_collision(hero, monster):
 def main():
     width = 512
     height = 480
-
+    pygame.mixer.init()
+    win_sound = pygame.mixer.Sound('./sounds/win.wav')
     pygame.init()
     screen = pygame.display.set_mode((width, height), pygame.DOUBLEBUF)
     pygame.display.set_caption('My Game')
@@ -123,6 +135,10 @@ def main():
     hero = Hero('./images/hero.png', width, height)
 
     monster = Monster('./images/monster.png', width, height, hero.x, hero.y, hero.width, hero.height)
+
+    font = pygame.font.Font(None, 25)
+    win_text = font.render('Hit ENTER to play again!', True, (0, 0, 0))
+    show_win_text = False
  
     min_x = hero.width
     max_x = width - hero.width * 2
@@ -135,37 +151,46 @@ def main():
         for event in pygame.event.get():
             # Event handling
             if event.type == pygame.KEYDOWN:
+                if monster.hidden and event.key == pygame.K_RETURN:
+                    hero = Hero('./images/hero.png', width, height)
+                    monster = Monster('./images/monster.png', width, height, hero.x, hero.y, hero.width, hero.height)
+                    show_win_text = False
                 try:
                     hero.start_moving[event.key]()
-                except:
-                    print('Invalid key')
+                except KeyError:
+                    pass
             if event.type == pygame.KEYUP:
                 try:
                     hero.stop_moving[event.key]()
-                except:
-                    print('Invalid key')
+                except KeyError:
+                    pass
             if event.type == pygame.QUIT:
                 stop_game = True
         
         # Game logic
-        # if time.time() % 2 == 0:
-        #     direction = random.choice(('north', 'east', 'south', 'west'))
         wrap = False
         hero.move(wrap, min_x, min_y, max_x, max_y)
-        if (time.time() - 2 > start):
-            start += 2
-            direction = random.choice(('north', 'east', 'south', 'west', 'northwest', 'northeast', 'southwest', 'southeast'))
-            monster.change_direction[direction]()
-        wrap = True
-        monster.move(wrap, min_x, min_y, max_x, max_y)
+        if not monster.hidden:
+            if (time.time() - 2 > start):
+                start += 2
+                direction = random.choice(('north', 'east', 'south', 'west', 'northwest', 'northeast', 'southwest', 'southeast'))
+                monster.change_direction[direction]()
+            wrap = True
+            monster.move(wrap, min_x, min_y, max_x, max_y)
         if check_collision(hero, monster):
-            print('Collision Detected')
+            monster.hide()
+            win_sound.play()
+            show_win_text = True
 
         # Draw background
         screen.fill([255,255,255])
         screen.blit(background, (0, 0))
         hero.blit(screen)
-        monster.blit(screen)
+        if not monster.hidden:
+            monster.blit(screen)
+        if show_win_text:
+            screen.blit(win_text, (width / 2 - win_text.get_width() / 2, height / 2 - win_text.get_height() / 2))
+
 
         # Game display
         pygame.display.update()
