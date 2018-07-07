@@ -1,4 +1,4 @@
-import pygame, random
+import pygame, random, time
 
 class Monster(object):
     def __init__(self, image_path, width, height, hero_x, hero_y, hero_width, hero_height):
@@ -60,9 +60,8 @@ def main():
     min_y = hero_height
     max_y = height - hero_height * 2
 
-    count = 1
-
     stop_game = False
+    start = time.time() - 2.1
     while not stop_game:
         for event in pygame.event.get():
             # Event handling
@@ -70,12 +69,11 @@ def main():
                 stop_game = True
         
         # Game logic
-        if count == 1:
+        # if time.time() % 2 == 0:
+        #     direction = random.choice(('north', 'east', 'south', 'west'))
+        if (time.time() - 2 > start):
+            start += 2
             direction = random.choice(('north', 'east', 'south', 'west'))
-        elif count == 120:
-            count = 0
-        count += 1
-
         monster.move[direction](min_x, min_y, max_x, max_y)
 
         # Draw background
