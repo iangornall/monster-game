@@ -1,12 +1,44 @@
 import pygame, random
 
+def move_north(x, y,
+                min_x, min_y,
+                max_x, max_y):
+    new_y = y - 1
+    if new_y < min_y:
+        new_y = max_y
+    return (x, new_y)
+
+def move_east(x, y,
+                min_x, min_y,
+                max_x, max_y):
+    new_x = x + 1
+    if new_x > max_x:
+        new_x = min_x
+    return (new_x, y)
+
+def move_south(x, y,
+                min_x, min_y,
+                max_x, max_y):
+    new_y = y + 1
+    if new_y > max_y:
+        new_y = min_y
+    return (x, new_y)
+
+def move_west(x, y,
+                min_x, min_y,
+                max_x, max_y):
+    new_x = x - 1
+    if new_x < min_x:
+        new_x = max_x
+    return (new_x, y)
+
 def main():
     width = 512
     height = 480
-    blue_color = (97, 159, 182)
+    move = {'north': move_north, 'east': move_east, 'south': move_south, 'west': move_west}
 
     pygame.init()
-    screen = pygame.display.set_mode((width, height))
+    screen = pygame.display.set_mode((width, height), pygame.DOUBLEBUF)
     pygame.display.set_caption('My Game')
     clock = pygame.time.Clock()
 
@@ -24,10 +56,10 @@ def main():
     monster_x = hero_x - monster_x_offset
     monster_y_offset = random.randint(hero_height, height / 2 - hero_height * 1.5) * random.randrange(-1, 2, 2)
     monster_y = hero_y - monster_y_offset
-    min_x_position = hero_width
-    max_x_position = width - hero_width * 2
-    min_y_position = hero_height
-    max_y_position = height - hero_height * 2
+    min_x = hero_width
+    max_x = width - hero_width * 2
+    min_y = hero_height
+    max_y = height - hero_height * 2
 
     count = 1
 
@@ -43,30 +75,14 @@ def main():
             direction = random.choice(('north', 'east', 'south', 'west'))
         elif count == 120:
             count = 0
+        count += 1
         # Game logic
-        if direction == 'north':
-            monster_y -= 1
-            if monster_y < min_y_position:
-                monster_y = max_y_position
-        elif direction == 'east':
-            monster_x += 1
-            if monster_x > max_x_position:
-                monster_x = min_x_position
-        elif direction == 'south':
-            monster_y += 1
-            if monster_y > max_y_position:
-                monster_y = min_y_position
-        elif direction == 'west':
-            monster_x -= 1
-            if monster_x < min_x_position:
-                monster_x = max_x_position
-
-
-        
+        monster_x, monster_y = move[direction](
+            monster_x, monster_y, min_x, min_y, max_x, max_y)
 
         # Draw background
+        screen.fill([255,255,255])
         screen.blit(background, (0, 0))
-        
         screen.blit(hero_image, (hero_x, hero_y))
         screen.blit(monster_image, 
                     (monster_x,
@@ -77,7 +93,6 @@ def main():
 
         pygame.display.update()
         clock.tick(60)
-        count += 1
 
     pygame.quit()
 
