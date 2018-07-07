@@ -12,14 +12,19 @@ def main():
 
     # Game initialization
     background = pygame.image.load('./images/background.png').convert_alpha()
+
     hero_image = pygame.image.load('./images/hero.png').convert_alpha()
-    heroWidth = hero_image.get_rect().width
-    heroX = width / 2 - heroWidth / 2
-    heroHeight = hero_image.get_rect().height
-    heroY = height / 2 - heroHeight / 2
+    hero_width = hero_image.get_rect().width
+    hero_x = width / 2 - hero_width / 2
+    hero_height = hero_image.get_rect().height
+    hero_y = height / 2 - hero_height / 2
+
     monster_image = pygame.image.load('./images/monster.png').convert_alpha()
-    monsterXOffset = random.randint(heroWidth, width / 2 - heroWidth * 1.5) * random.randrange(-1, 2, 2)
-    monsterYOffset = random.randint(heroHeight, height / 2 - heroHeight * 1.5) * random.randrange(-1, 2, 2)
+    monster_x_offset = random.randint(hero_width, width / 2 - hero_width * 1.5) * random.randrange(-1, 2, 2)
+    monster_x = hero_x - monster_x_offset
+    monster_y_offset = random.randint(hero_height, height / 2 - hero_height * 1.5) * random.randrange(-1, 2, 2)
+    monster_y = hero_y - monster_y_offset
+
     stop_game = False
     while not stop_game:
         for event in pygame.event.get():
@@ -31,14 +36,15 @@ def main():
 
 
         # Game logic
+        
 
         # Draw background
         screen.blit(background, (0, 0))
         
-        screen.blit(hero_image, (heroX, heroY))
+        screen.blit(hero_image, (hero_x, hero_y))
         screen.blit(monster_image, 
-                    (heroX - monsterXOffset,
-                    heroY - monsterYOffset))
+                    (monster_x,
+                    monster_y))
 
 
         # Game display
