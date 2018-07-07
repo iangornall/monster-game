@@ -92,7 +92,6 @@ class Goblin(Enemy):
         super(Goblin, self).__init__(image_path, width, height, hero_x, hero_y, hero_width, hero_height)
         self.pace = 0.5
 
-
 class Hero(Character):
     def __init__(self, image_path, screen_width, screen_height):
         super(Hero, self).__init__(image_path)
@@ -132,6 +131,7 @@ def check_collision(hero, monster):
 def main():
     width = 512
     height = 480
+    level = 1
     pygame.mixer.init()
     win_sound = pygame.mixer.Sound('./sounds/win.wav')
     lose_sound = pygame.mixer.Sound('./sounds/lose.wav')
@@ -148,10 +148,11 @@ def main():
 
     monster = Monster('./images/monster.png', width, height, hero.x, hero.y, hero.width, hero.height)
     goblins = []
-    for i in range(3):
+    for i in range(level):
         goblins.append(Goblin('./images/goblin.png', width, height, hero.x, hero.y, hero.width, hero.height))
 
     font = pygame.font.Font(None, 25)
+    level_text = font.render('Level: ' + str(level), True, (0, 0, 0))
     win_text = font.render('You win! Hit ENTER to play again!', True, (0, 0, 0))
     lose_text = font.render('You lose! Hit ENTER to play again!', True, (0, 0, 0))
     win = False
@@ -171,9 +172,13 @@ def main():
                 if (win or lose) and event.key == pygame.K_RETURN:
                     hero = Hero('./images/hero.png', width, height)
                     monster = Monster('./images/monster.png', width, height, hero.x, hero.y, hero.width, hero.height)
+                    goblins = []
+                    for i in range(level):
+                        goblins.append(Goblin('./images/goblin.png', width, height, hero.x, hero.y, hero.width, hero.height))
                     win = False
                     lose = False
                     pygame.mixer.music.play(loops=-1)
+                    level_text = font.render('Level: ' + str(level), True, (0, 0, 0))
                 try:
                     hero.start_moving[event.key]()
                 except KeyError:
@@ -208,6 +213,7 @@ def main():
             pygame.mixer.music.stop()
             win_sound.play()
             win = True
+            level += 1
         for goblin in goblins:
             if check_collision(hero, goblin):
                 monster.hide()
@@ -220,6 +226,7 @@ def main():
         # Draw background
         screen.fill([255,255,255])
         screen.blit(background, (0, 0))
+        screen.blit(level_text, (32, 32))
         hero.blit(screen)
         if not monster.hidden:
             monster.blit(screen)
