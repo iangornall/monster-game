@@ -7,31 +7,62 @@ class Monster(object):
         self.x = hero_x - x_offset
         y_offset = random.randint(hero_height, height / 2 - hero_height * 1.5) * random.randrange(-1, 2, 2)
         self.y = hero_y - y_offset
-        self.move = {'north': self.move_north, 'east': self.move_east, 'south': self.move_south, 'west': self.move_west}
-    def move_north(self,
+        self.move = {'north': self.move_north, 
+                    'east': self.move_east, 
+                    'south': self.move_south, 
+                    'west': self.move_west, 
+                    'northwest': self.move_northwest, 
+                    'northeast': self.move_northeast, 
+                    'southwest': self.move_southwest, 
+                    'southeast': self.move_southeast}
+    def move_north(self, clock,
                     min_x, min_y,
                     max_x, max_y):
         self.y -= 1
         if self.y < min_y:
             self.y = max_y
-    def move_east(self,
+    def move_east(self, clock,
                     min_x, min_y,
                     max_x, max_y):
         self.x += 1
         if self.x > max_x:
             self.x = min_x
-    def move_south(self,
+    def move_south(self, clock,
                     min_x, min_y,
                     max_x, max_y):
         self.y += 1
         if self.y > max_y:
             self.y = min_y
-    def move_west(self,
+    def move_west(self, clock,
                     min_x, min_y,
                     max_x, max_y):
         self.x -= 1
         if self.x < min_x:
             self.x = max_x
+    def move_northwest(self, clock,
+                    min_x, min_y,
+                    max_x, max_y):
+        self.move_north(clock, min_x, min_y, max_x, max_y)
+        self.move_west(clock, min_x, min_y, max_x, max_y)
+        clock.tick(60)
+    def move_northeast(self, clock,
+                    min_x, min_y,
+                    max_x, max_y):
+        self.move_north(clock, min_x, min_y, max_x, max_y)
+        self.move_east(clock, min_x, min_y, max_x, max_y)
+        clock.tick(60)
+    def move_southwest(self, clock,
+                    min_x, min_y,
+                    max_x, max_y):
+        self.move_south(clock, min_x, min_y, max_x, max_y)
+        self.move_west(clock, min_x, min_y, max_x, max_y)
+        clock.tick(60)
+    def move_southeast(self, clock,
+                    min_x, min_y,
+                    max_x, max_y):
+        self.move_south(clock, min_x, min_y, max_x, max_y)
+        self.move_east(clock, min_x, min_y, max_x, max_y)
+        clock.tick(60)
     def blit(self, screen):
         screen.blit(self.image, (self.x, self.y))
 
@@ -73,8 +104,8 @@ def main():
         #     direction = random.choice(('north', 'east', 'south', 'west'))
         if (time.time() - 2 > start):
             start += 2
-            direction = random.choice(('north', 'east', 'south', 'west'))
-        monster.move[direction](min_x, min_y, max_x, max_y)
+            direction = random.choice(('north', 'east', 'south', 'west', 'northwest', 'northeast', 'southwest', 'southeast'))
+        monster.move[direction](clock, min_x, min_y, max_x, max_y)
 
         # Draw background
         screen.fill([255,255,255])
