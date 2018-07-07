@@ -145,8 +145,9 @@ def main():
     hero = Hero('./images/hero.png', width, height)
 
     monster = Monster('./images/monster.png', width, height, hero.x, hero.y, hero.width, hero.height)
-
-    goblin = Goblin('./images/goblin.png', width, height, hero.x, hero.y, hero.width, hero.height)
+    goblins = []
+    for i in range(3):
+        goblins.append(Goblin('./images/goblin.png', width, height, hero.x, hero.y, hero.width, hero.height))
 
     font = pygame.font.Font(None, 25)
     win_text = font.render('You win! Hit ENTER to play again!', True, (0, 0, 0))
@@ -190,21 +191,26 @@ def main():
                 start += 2
                 monster_direction = random.choice(('north', 'east', 'south', 'west', 'northwest', 'northeast', 'southwest', 'southeast'))
                 monster.change_direction[monster_direction]()
-                goblin_direction = random.choice(('north', 'east', 'south', 'west', 'northwest', 'northeast', 'southwest', 'southeast'))
-                goblin.change_direction[goblin_direction]()
+                for goblin in goblins:
+                    goblin_direction = random.choice(('north', 'east', 'south', 'west', 'northwest', 'northeast', 'southwest', 'southeast'))
+                    goblin.change_direction[goblin_direction]()
             wrap = True
             monster.move(wrap, min_x, min_y, max_x, max_y)
-            goblin.move(wrap, min_x, min_y, max_x, max_y)
+            for goblin in goblins:
+                goblin.move(wrap, min_x, min_y, max_x, max_y)
         if check_collision(hero, monster):
             monster.hide()
-            goblin.hide()
+            for goblin in goblins:
+                goblin.hide()
             win_sound.play()
             win = True
-        if check_collision(hero, goblin):
-            monster.hide()
-            goblin.hide()
-            lose_sound.play()
-            lose = True
+        for goblin in goblins:
+            if check_collision(hero, goblin):
+                monster.hide()
+                for goblin in goblins:
+                    goblin.hide()
+                lose_sound.play()
+                lose = True
 
         # Draw background
         screen.fill([255,255,255])
@@ -212,7 +218,8 @@ def main():
         hero.blit(screen)
         if not monster.hidden:
             monster.blit(screen)
-            goblin.blit(screen)
+            for goblin in goblins:
+                goblin.blit(screen)
         if win:
             screen.blit(win_text, (width / 2 - win_text.get_width() / 2, height / 2 - win_text.get_height() / 2))
         elif lose:
