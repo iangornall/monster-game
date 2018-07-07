@@ -134,6 +134,7 @@ def main():
     height = 480
     pygame.mixer.init()
     win_sound = pygame.mixer.Sound('./sounds/win.wav')
+    lose_sound = pygame.mixer.Sound('./sounds/lose.wav')
     pygame.init()
     screen = pygame.display.set_mode((width, height), pygame.DOUBLEBUF)
     pygame.display.set_caption('My Game')
@@ -148,8 +149,10 @@ def main():
     goblin = Goblin('./images/goblin.png', width, height, hero.x, hero.y, hero.width, hero.height)
 
     font = pygame.font.Font(None, 25)
-    win_text = font.render('Hit ENTER to play again!', True, (0, 0, 0))
-    show_win_text = False
+    win_text = font.render('You win! Hit ENTER to play again!', True, (0, 0, 0))
+    lose_text = font.render('You lose! Hit ENTER to play again!', True, (0, 0, 0))
+    win = False
+    lose = False
  
     min_x = hero.width
     max_x = width - hero.width * 2
@@ -162,10 +165,11 @@ def main():
         for event in pygame.event.get():
             # Event handling
             if event.type == pygame.KEYDOWN:
-                if monster.hidden and event.key == pygame.K_RETURN:
+                if (win or lose) and event.key == pygame.K_RETURN:
                     hero = Hero('./images/hero.png', width, height)
                     monster = Monster('./images/monster.png', width, height, hero.x, hero.y, hero.width, hero.height)
-                    show_win_text = False
+                    win = False
+                    lose = False
                 try:
                     hero.start_moving[event.key]()
                 except KeyError:
@@ -193,8 +197,14 @@ def main():
             goblin.move(wrap, min_x, min_y, max_x, max_y)
         if check_collision(hero, monster):
             monster.hide()
+            goblin.hide()
             win_sound.play()
-            show_win_text = True
+            win = True
+        if check_collision(hero, goblin):
+            monster.hide()
+            goblin.hide()
+            lose_sound.play()
+            lose = True
 
         # Draw background
         screen.fill([255,255,255])
@@ -203,9 +213,10 @@ def main():
         if not monster.hidden:
             monster.blit(screen)
             goblin.blit(screen)
-        if show_win_text:
+        if win:
             screen.blit(win_text, (width / 2 - win_text.get_width() / 2, height / 2 - win_text.get_height() / 2))
-
+        elif lose:
+            screen.blit(lose_text, (width / 2 - lose_text.get_width() / 2, height / 2 - lose_text.get_height() / 2))
 
         # Game display
         pygame.display.update()
