@@ -135,6 +135,8 @@ def main():
     pygame.mixer.init()
     win_sound = pygame.mixer.Sound('./sounds/win.wav')
     lose_sound = pygame.mixer.Sound('./sounds/lose.wav')
+    music = pygame.mixer.music.load('./sounds/music.wav')
+    pygame.mixer.music.play(loops=-1)
     pygame.init()
     screen = pygame.display.set_mode((width, height), pygame.DOUBLEBUF)
     pygame.display.set_caption('My Game')
@@ -171,6 +173,7 @@ def main():
                     monster = Monster('./images/monster.png', width, height, hero.x, hero.y, hero.width, hero.height)
                     win = False
                     lose = False
+                    pygame.mixer.music.play(loops=-1)
                 try:
                     hero.start_moving[event.key]()
                 except KeyError:
@@ -202,6 +205,7 @@ def main():
             monster.hide()
             for goblin in goblins:
                 goblin.hide()
+            pygame.mixer.music.stop()
             win_sound.play()
             win = True
         for goblin in goblins:
@@ -209,6 +213,7 @@ def main():
                 monster.hide()
                 for goblin in goblins:
                     goblin.hide()
+                pygame.mixer.music.stop()
                 lose_sound.play()
                 lose = True
 
