@@ -1,132 +1,15 @@
 import pygame, random, time
+from hero import Hero
+from enemy import Monster, Goblin
 
-class Character(object):
-    def __init__(self, image_path):
-        self.image = pygame.image.load(image_path).convert_alpha()
-        self.width = self.image.get_rect().width
-        self.height = self.image.get_rect().height
-        self.x = None
-        self.y = None
-        self.pace = None
-        self.x_speed = None
-        self.y_speed = None
-        
-    def move(self, wrap, min_x, min_y,
-                    max_x, max_y):
-        self.x += self.x_speed
-        self.y += self.y_speed
-        if wrap:
-            if self.y < min_y:
-                self.y = max_y
-            elif self.y > max_y:
-                self.y = min_y
-            if self.x < min_x:
-                self.x = max_x
-            elif self.x > max_x:
-                self.x = min_x
-        else:
-            if self.y < min_y:
-                self.y = min_y
-            elif self.y > max_y:
-                self.y = max_y
-            if self.x < min_x:
-                self.x = min_x
-            elif self.x > max_x:
-                self.x = max_x
-    def north(self):
-        self.y_speed = -1 * self.pace
-    def east(self):
-        self.x_speed = self.pace
-    def south(self):
-        self.y_speed = self.pace
-    def west(self):
-        self.x_speed = -1 * self.pace
-    def northwest(self):
-        self.north()
-        self.west()
-    def northeast(self):
-        self.north()
-        self.east()
-    def southwest(self):
-        self.south()
-        self.west()
-    def southeast(self):
-        self.south()
-        self.east()
-    def blit(self, screen):
-        screen.blit(self.image, (self.x, self.y))
-
-class Enemy(Character):
-    def __init__(self, image_path, width, height, border_size, hero_x, hero_y, hero_width, hero_height):
-        super(Enemy, self).__init__(image_path)
-        # Place enemy at random position away from hero:
-        left_side = range(border_size, int(hero_x))
-        right_side = range(int(hero_x) + hero_width, width - border_size)
-        x_possible = list(left_side) + list(right_side)
-        self.x = random.choice(x_possible)
-        top_side = range(border_size, int(hero_y))
-        bottom_side = range(int(hero_y) + hero_height, height - border_size)
-        y_possible = list(top_side) + list(bottom_side)
-        self.y = random.choice(y_possible)
-        
-        self.pace = None
-        self.x_speed = 0
-        self.y_speed = 0
-        self.change_direction = {'north': self.north, 
-                    'east': self.east, 
-                    'south': self.south, 
-                    'west': self.west, 
-                    'northwest': self.northwest, 
-                    'northeast': self.northeast, 
-                    'southwest': self.southwest, 
-                    'southeast': self.southeast}
-        self.hidden = False
-    def hide(self):
-        self.x = 0
-        self.y = 0
-        self.x_speed = 0
-        self.y_speed = 0
-        self.hidden = True
-
-class Monster(Enemy):
-    def __init__(self, image_path, width, height, border_size, hero_x, hero_y, hero_width, hero_height):
-        super(Monster, self).__init__(image_path, width, height, border_size, hero_x, hero_y, hero_width, hero_height)
-        self.pace = 1
-
-class Goblin(Enemy):
-    def __init__(self, image_path, width, height, border_size, hero_x, hero_y, hero_width, hero_height):
-        super(Goblin, self).__init__(image_path, width, height, border_size, hero_x, hero_y, hero_width, hero_height)
-        self.pace = 0.5
-
-class Hero(Character):
-    def __init__(self, image_path, screen_width, screen_height):
-        super(Hero, self).__init__(image_path)
-        self.x = screen_width / 2 - self.width / 2
-        self.y = screen_height / 2 - self.height / 2
-        self.pace = 0.9
-        self.x_speed = 0
-        self.y_speed = 0
-        self.start_moving = {pygame.K_DOWN: self.south, 
-                                pygame.K_UP: self.north, 
-                                pygame.K_LEFT: self.west,
-                                pygame.K_RIGHT: self.east}
-        self.stop_moving = {pygame.K_DOWN: self.stopY,
-                                pygame.K_UP: self.stopY,
-                                pygame.K_LEFT: self.stopX,
-                                pygame.K_RIGHT: self.stopX}
-    def stopX(self):
-        self.x_speed = 0
-    def stopY(self):
-        self.y_speed = 0
-
-def check_collision(hero, monster):
-    if hero.x + hero.width < monster.x:
+def check_collision(hero, enemy):
+    if hero.x + hero.width < enemy.x:
         return False
-    if monster.x + monster.width < hero.x:
+    if enemy.x + enemy.width < hero.x:
         return False
-    if hero.y + hero.height < monster.y:
+    if hero.y + hero.height < enemy.y:
         return False
-    if monster.y + monster.height < hero.y:
+    if enemy.y + enemy.height < hero.y:
         return False
     return True
 
