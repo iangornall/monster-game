@@ -13,6 +13,14 @@ def check_collision(hero, enemy):
         return False
     return True
 
+def load_characters(width, height, border_size, level):
+    hero = Hero('./images/hero.png', width, height)
+    monster = Monster('./images/monster.png', width, height, border_size, hero)
+    goblins = []
+    for i in range(level):
+        goblins.append(Goblin('./images/goblin.png', width, height, border_size, hero))
+    return (hero, monster, goblins)
+
 def main():
     width = 512
     height = 480
@@ -37,12 +45,7 @@ def main():
 
     background = pygame.image.load('./images/background.png').convert_alpha()
 
-    # Load characters
-    hero = Hero('./images/hero.png', width, height)
-    monster = Monster('./images/monster.png', width, height, border_size, hero.x, hero.y, hero.width, hero.height)
-    goblins = []
-    for i in range(level):
-        goblins.append(Goblin('./images/goblin.png', width, height, border_size, hero.x, hero.y, hero.width, hero.height))
+    hero, monster, goblins = load_characters(width, height, border_size, level)
 
     # Bound coordinates over which characters can travel
     min_x = border_size
@@ -64,13 +67,7 @@ def main():
             if event.type == pygame.KEYDOWN:
                 # Handle game restart
                 if (win or lose) and event.key == pygame.K_RETURN:
-                    # Reset characters
-                    hero = Hero('./images/hero.png', width, height)
-                    monster = Monster('./images/monster.png', width, height, border_size, hero.x, hero.y, hero.width, hero.height)
-                    goblins = []
-                    for i in range(level):
-                        goblins.append(Goblin('./images/goblin.png', width, height, border_size, hero.x, hero.y, hero.width, hero.height))
-
+                    hero, monster, goblins = load_characters(width, height, border_size, level)
                     win = False
                     lose = False
                     pygame.mixer.music.play(loops=-1)

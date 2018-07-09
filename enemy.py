@@ -2,15 +2,15 @@ import pygame, random
 from character import Character
 
 class Enemy(Character):
-    def __init__(self, image_path, width, height, border_size, hero_x, hero_y, hero_width, hero_height):
+    def __init__(self, image_path, width, height, border_size, hero):
         super(Enemy, self).__init__(image_path)
         # Place enemy at random position away from hero:
-        left_side = range(border_size, int(hero_x))
-        right_side = range(int(hero_x) + hero_width, width - border_size)
+        left_side = range(border_size, int(hero.x))
+        right_side = range(int(hero.x) + hero.width, width - border_size)
         x_possible = list(left_side) + list(right_side)
         self.x = random.choice(x_possible)
-        top_side = range(border_size, int(hero_y))
-        bottom_side = range(int(hero_y) + hero_height, height - border_size)
+        top_side = range(border_size, int(hero.y))
+        bottom_side = range(int(hero.y) + hero.height, height - border_size)
         y_possible = list(top_side) + list(bottom_side)
         self.y = random.choice(y_possible)
         
@@ -34,11 +34,11 @@ class Enemy(Character):
         self.hidden = True
 
 class Monster(Enemy):
-    def __init__(self, image_path, width, height, border_size, hero_x, hero_y, hero_width, hero_height):
-        super(Monster, self).__init__(image_path, width, height, border_size, hero_x, hero_y, hero_width, hero_height)
+    def __init__(self, image_path, width, height, border_size, hero):
+        super(Monster, self).__init__(image_path, width, height, border_size, hero)
         self.pace = 1
 
 class Goblin(Enemy):
-    def __init__(self, image_path, width, height, border_size, hero_x, hero_y, hero_width, hero_height):
-        super(Goblin, self).__init__(image_path, width, height, border_size, hero_x, hero_y, hero_width, hero_height)
+    def __init__(self, image_path, width, height, border_size, hero):
+        super(Goblin, self).__init__(image_path, width, height, border_size, hero)
         self.pace = 0.5
